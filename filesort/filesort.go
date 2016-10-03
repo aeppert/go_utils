@@ -15,7 +15,7 @@ const (
 	sortByFileSizeDesc AeFileSort = iota
 	sortByTimeAsc      AeFileSort = iota
 	sortByTimeDesc     AeFileSort = iota
-	sortByDefault      AeFileSort = sortByNameAsc
+	sortByDefault      AeFileSort = sortByNameDesc
 )
 
 // byName implements sort.Interface.
@@ -37,9 +37,9 @@ func (f byTime) Len() int           { return len(f) }
 func (f byTime) Less(i, j int) bool { return f[i].ModTime().Before(f[j].ModTime()) }
 func (f byTime) Swap(i, j int)      { f[i], f[j] = f[j], f[i] }
 
-// PsReadDir reads the directory named by dirname and returns
+// AeReadDir reads the directory named by dirname and returns
 // a list of directory entries sorted by AeFileSort.
-func PsReadDir(dirname string, sortType AeFileSort) ([]os.FileInfo, error) {
+func AeReadDir(dirname string, sortType AeFileSort) ([]os.FileInfo, error) {
 	f, err := os.Open(dirname)
 	if err != nil {
 		return nil, err
@@ -52,22 +52,22 @@ func PsReadDir(dirname string, sortType AeFileSort) ([]os.FileInfo, error) {
 
 	switch sortType {
 
-	case sortByNameDesc:
+	case sortByNameAsc:
 		sort.Sort(sort.Reverse(byName(list)))
 
-	case sortByFileSizeAsc:
+	case sortByFileSizeDesc:
 		sort.Sort(bySize(list))
 
-	case sortByFileSizeDesc:
+	case sortByFileSizeAsc:
 		sort.Sort(sort.Reverse(bySize(list)))
 
 	case sortByTimeAsc:
-		sort.Sort(byTime(list))
-
-	case sortByTimeDesc:
 		sort.Sort(sort.Reverse(byTime(list)))
 
-	case sortByNameAsc:
+	case sortByTimeDesc:
+		sort.Sort(byTime(list))
+
+	case sortByNameDesc:
 		fallthrough
 
 	case sortByDefault:
